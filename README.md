@@ -65,6 +65,33 @@ use the Xbox Wireless Adapter or a cable.
 About six minutes for all five. Repeatability measured across a power cycle:
 axis 5 exact, axis 4 within 5 counts, axis 0 within 813 counts of 5.1 M.
 
+## Backing up the controller
+
+The axis tuning, fault configuration and ACSPL+ buffers exist **only** in the
+controller's flash. A failed firmware update or a board swap takes all of it.
+
+```
+python tools\backup_controller.py          # read-only: parameters + buffers
+python tools\backup_controller.py --spi    # also the .spi restore image
+```
+
+Output lands in `config/backup/` so it is version-controlled:
+
+| file | restores? |
+|---|---|
+| `parameters.txt` / `.json` | no — a readable snapshot, so git can diff it |
+| `buffers/*.prg` | yes, per buffer |
+| `application-*.spi` | **yes — everything** |
+
+`--spi` is opt-in: saving the image writes controller flash before copying
+flash to the file, and flash is rated around 100k cycles. Run it deliberately
+after you change something, not on a schedule.
+
+The same image can be produced from the MMI — Toolbox → Application
+Development → Application Wizard → *Save Application to PC* — and loaded back
+with *Load Application to Controller*, which supports remapping source axis N
+onto destination axis M.
+
 ## Safety
 
 - **Watchdog.** The panel writes a heartbeat the controller watches from its

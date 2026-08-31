@@ -1,0 +1,63 @@
+# controller 10.0.0.101:701
+# read at    2026-08-31T17:57:40
+#
+# Readable snapshot for diffing. NOT a restore image -- use the .spi.
+
+parameter               axis 0            axis 1            axis 4            axis 5            axis 6
+                      Linear Y          Linear X        Rotation A        Rotation B        Rotation C
+------------------------------------------------------------------------------------------------------
+VEL                 24,320,000        24,320,000            10,314            10,314            10,314
+ACC                243,200,000       243,200,000           152,000           152,000           152,000
+DEC                243,200,000       243,200,000           152,000           152,000           152,000
+JERK                80,000,000        80,000,000           160,000           160,000           160,000
+KDEC               256,000,000       256,000,000       2.66667e+06       2.66667e+06       2.66667e+06
+XVEL                25,600,000        25,600,000           266,667           266,667           266,667
+XACC               256,000,000       256,000,000       2.66667e+06       2.66667e+06       2.66667e+06
+SLLIMIT           -2.51271e+06      -1.63967e+06         -27,106.2         -27,548.8         -25,886.5
+SRLIMIT            2.50723e+06        1.2456e+06                -3                -5                -3
+CERRV                    2,500             2,500               750               750               750
+CERRI                    1,000             1,000               500               500               500
+CERRA                    5,000             5,000             1,000             1,000             1,000
+ERRV                       100               100               100               100               100
+ERRI                       100               100               100               100               100
+ERRA                       100               100               100               100               100
+EFAC                         1                 1                 1                 1                 1
+EOFFS                1,497,472           932,864           -13,977           -13,635            -9,569
+XCURV                       64                64               3.8               3.8               3.8
+XCURI                       32                32               1.9               1.9               1.9
+XRMSM                       16                16              2.02              2.02              2.02
+XRMSD                       50                50                50                50                50
+XRMST                    3,476             3,476             3,476             3,476             3,476
+SLPKP                      300               300                75                75                75
+SLPKI                        0                 0                 0                 0                 0
+SLVKP                      380               380               225               225               225
+SLVKI                      450               450                55                55                55
+SLVLI                       50                50                50                50                50
+SLAFF                    1,800             1,800                 0                 0                 0
+SLVSOF                     500               500               550               550               550
+SLVNFRQ                    300               300               300               300               300
+SLVNWID                     30                30                30                30                30
+SLVNATT                      5                 5                 5                 5                 5
+SLIKP                  809.672           809.672             1,150             1,150             1,150
+SLCOFFS                      0                 0                 0                 0                 0
+MFLAGS              0x002a3308        0x002a1308        0x000a1008        0x000a1008        0x000a1008
+FMASK               0xbf8776e7        0xbf8776e7        0xbf8776e7        0xbf8776e7        0xbf8776e7
+FDEF                0x007fffff        0x007fffff        0x007fffff        0x007fffff        0x007fffff
+SAFINI                       0                 0                 3                 3                 3
+AFLAGS              0x00000000        0x00000000        0x00000000        0x00000000        0x00000000
+
+MFLAGS decoded:
+  axis 0 Linear Y     #HOME=1 #BRUSHL=1 #BRUSHOK=1 #INVDOUT=1
+  axis 1 Linear X     #HOME=1 #BRUSHL=1 #BRUSHOK=1 #INVDOUT=0
+  axis 4 Rotation A   #HOME=1 #BRUSHL=0 #BRUSHOK=0 #INVDOUT=0
+  axis 5 Rotation B   #HOME=1 #BRUSHL=0 #BRUSHOK=0 #INVDOUT=0
+  axis 6 Rotation C   #HOME=1 #BRUSHL=0 #BRUSHOK=0 #INVDOUT=0
+
+system:
+  HOSTWDEN     = 0
+  HOSTWDTMO    = 1000
+  HOSTWDOG     = 6675
+  HOSTWDFIRED  = 0
+
+not implemented on this firmware:
+  CFACTOR, E1TYPE, E2TYPE, ENCTYPE, IFLAGS, NFLAGS, SLVFF, XDEC, XJERK, XRMSTL

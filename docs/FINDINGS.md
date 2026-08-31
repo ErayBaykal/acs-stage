@@ -758,6 +758,51 @@ UI picks it up on its next connect. Nothing to keep in sync, nothing to forget t
 
 The `.spi` file then serves its proper purpose — disaster recovery and machine duplication.
 
+### What `tools/backup_controller.py` captures
+
+Run it to put the controller's flash contents into the repo. Read-only unless `--spi` is passed.
+
+| output | what it is | restores? |
+|---|---|---|
+| `config/backup/parameters.txt` | 39 parameters per axis as a table, plus decoded `MFLAGS` bits | no — for diffing |
+| `config/backup/parameters.json` | the same, machine-readable | no |
+| `config/backup/buffers/*.prg` | every non-empty ACSPL+ buffer, as text | yes, per buffer |
+| `config/backup/application-*.spi` | the full application image (`--spi`) | **yes, everything** |
+
+Only the `.spi` is a true restore image. The text outputs exist because a binary blob cannot answer
+"what changed since last week, and did anyone touch `#INVDOUT` again?" — the readable table diffs in
+git and the `.spi` sitting beside it does the actual recovery.
+
+`--spi` is opt-in because `SaveApplication` writes controller flash before copying flash → file.
+Flash is rated ~100k cycles; run it deliberately, never on a timer.
+
+### The machine builder's axis names, recovered from buffer 1
+
+Buffer 1 holds an integrator's startup program that sets `KDEC`/`JERK` per axis, each line commented
+with the axis's original name:
+
+| axis | OEM name | this project |
+|---|---|---|
+| 0 | `Y1` | Linear Y |
+| 1 | `X1` | Linear X |
+| 2 | `Z1` | — no stage |
+| 3 | `Z_BCT1` | — no stage |
+| 4 | `Rz_PUT1` | Rotation A |
+| 5 | `Ry_PUT1` | Rotation B |
+| 6 | `Rx_PUT1` | Rotation C |
+| 8 | `X2` | — no stage |
+| 10, 11 | `X_BCT1`, `Y_BCT1` | — no stage |
+
+**Axis 0 is Y and axis 1 is X**, independently of anything in this project — which is what the panel
+now displays, having arrived there from the gamepad buttons. The rotation stages are `Rz`, `Ry`,
+`Rx` in axis order, so A/B/C map to Rz/Ry/Rx.
+
+Buffer 1 also issues `SETCONF(270, 4|5|6, 5)` for the three rotation axes.
+
+Note that buffer 1 is **not in effect**: it sets `KDEC(0) = 3E7`, while the live value reads
+`2.56E8`. So it is either not run at startup or has been superseded — do not assume the values in
+it describe the machine. The live readout does.
+
 ## 4. Homing is already implemented in controller firmware
 
 The `HOME` ACSPL+ command covers **both** of your homing situations natively. No hand-rolled
