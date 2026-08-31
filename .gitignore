@@ -1,0 +1,10 @@
+# Virtual environment -- 731 MB, and spiipluspython is a machine-specific wheel
+.venv/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Runtime output
+*.log

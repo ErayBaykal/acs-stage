@@ -1,0 +1,51 @@
+{
+  "written_at": "2026-08-31T16:27:31",
+  "note": "Measured by the calibration routine. Counts are in the homed coordinate frame; invalid if the axis is re-homed against a different reference.",
+  "axes": [
+    {
+      "axis": 0,
+      "min_counts": -2563934.0,
+      "max_counts": 2558453.0,
+      "min_reference": "hard stop",
+      "max_reference": "hard stop",
+      "measured_at": "2026-08-31T16:23:05",
+      "homed_zero": -1.0
+    },
+    {
+      "axis": 1,
+      "min_counts": -1669110.0,
+      "max_counts": 1275044.0,
+      "min_reference": "hard stop",
+      "max_reference": "hard stop",
+      "measured_at": "2026-08-31T16:23:50",
+      "homed_zero": 0.0
+    },
+    {
+      "axis": 4,
+      "min_counts": -27380.0,
+      "max_counts": -3.0,
+      "min_reference": "hard stop",
+      "max_reference": "limit switch",
+      "measured_at": "2026-08-31T16:25:05",
+      "homed_zero": -3.0
+    },
+    {
+      "axis": 5,
+      "min_counts": -27827.0,
+      "max_counts": -5.0,
+      "min_reference": "hard stop",
+      "max_reference": "limit switch",
+      "measured_at": "2026-08-31T16:26:21",
+      "homed_zero": -5.0
+    },
+    {
+      "axis": 6,
+      "min_counts": -26148.0,
+      "max_counts": -3.0,
+      "min_reference": "hard stop",
+      "max_reference": "limit switch",
+      "measured_at": "2026-08-31T16:27:31",
+      "homed_zero": -3.0
+    }
+  ]
+}
