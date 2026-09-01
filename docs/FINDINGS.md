@@ -809,6 +809,44 @@ Spot-checked against the live readout and every value agrees — `SLLIMIT(0)=-25
 Not represented: **user files**. The controller's file system is either empty or was not selected in
 the wizard. Nothing else is missing.
 
+### Restoring needs no MMI — but a `.spi` is not a whole machine
+
+The Python binding exposes the full path: `AnalyzeApplication` → set `section.inuse` →
+`LoadApplication` → `ControllerReboot`. `tools/restore_controller.py` wraps it, dry-run by default.
+
+`AnalyzeApplication` against our own image returns `ErrCode 0`, `sections_num 52`, and `error 0` on
+every section, with offsets, sizes and CRCs matching a hand parse of the container. The library and
+an independent reader agree on the file.
+
+Three things a `.spi` cannot restore, all of which a bare-metal rebuild needs first:
+
+1. **Firmware.** The image records `2.60` as an attribute; it does not carry it.
+2. **Reachability.** A factory-reset controller is not at `10.0.0.101`. `OpenCommEthernetTCP`
+   cannot reach it, so no host tool can. MMI or the Upgrader has to find it at its default address
+   first.
+3. **Commutation and homing at runtime.** `ADJ<n>` holds the adjuster *calibration*, not the
+   runtime commutation state. Incremental encoders lose both on every power-up regardless.
+
+### `MST.#MOVE` is unusable as a guard, and FPOS needs a tolerance
+
+A "refuse while moving" check built on `MST.#MOVE` reported axes 0 and 1 as moving on a parked
+machine — the sticky-bit behaviour already noted in `calibrate.py`.
+
+Rebuilding it on `FPOS` was not enough either: exact equality between two samples still flagged the
+linear axes. Measured over 25 samples with every axis enabled and holding position:
+
+| axis | peak-to-peak | max step |
+|---|---|---|
+| 0 Linear Y | 2.0 | 2.0 |
+| 1 Linear X | 1.0 | 1.0 |
+| 4 Rotation A | 0.0 | 0.0 |
+| 5 Rotation B | 0.0 | 0.0 |
+| 6 Rotation C | 2.0 | 1.0 |
+
+So a held axis dithers 1-2 counts. The guard uses **10 counts over 0.4 s** — five times the observed
+dither, and well under the ~172 counts the slowest configured jog (axis 6 fine, 431 cts/s) covers in
+that window. A guard that fires on a stationary machine is one people learn to bypass.
+
 ### The D-buffer holds the axis names — and `range(16)` misses it
 
 `GetDBufferIndex` returns **16** on this controller, one past the program buffers, so a scan of

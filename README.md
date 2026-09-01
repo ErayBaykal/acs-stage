@@ -92,6 +92,33 @@ Development → Application Wizard → *Save Application to PC* — and loaded b
 with *Load Application to Controller*, which supports remapping source axis N
 onto destination axis M.
 
+### Restoring
+
+```
+python tools\restore_controller.py config\backup\application-2026-08-31.spi
+python tools\restore_controller.py <file> --apply
+```
+
+No MMI needed — the SPiiPlus Python binding exposes the whole path
+(`AnalyzeApplication` → `LoadApplication` → `ControllerReboot`).
+
+**It does nothing without `--apply`.** The default is a dry run that connects,
+validates the image against the controller in front of it, and prints what
+would be written. Restoring overwrites parameters, buffers and commutation
+data, so the guards are deliberate: it refuses on a serial-number mismatch
+unless you pass `--any-serial`, warns on a firmware mismatch, and refuses
+while any axis is moving. `--only parameters` (or `buffers`, `commutation`,
+`variables`) restores one group.
+
+What a `.spi` cannot give you, so a bare-metal rebuild still needs:
+
+1. **Firmware** — install it first; the image records `2.60` but does not
+   contain it.
+2. **Network reachability** — a factory-reset controller is not at
+   `10.0.0.101`, and nothing here can reach it until it is.
+3. **Commutation and homing** — the image carries the adjuster calibration,
+   but the encoders are incremental, so every power-up still needs both.
+
 ## Safety
 
 - **Watchdog.** The panel writes a heartbeat the controller watches from its
