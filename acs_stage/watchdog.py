@@ -13,11 +13,12 @@ from pathlib import Path
 import SPiiPlusPython as sp
 
 from . import config as cfg
+from . import paths
 from .controller import NONE, ControllerError, StageController
 
 log = logging.getLogger(__name__)
 
-PROGRAM_PATH = Path(__file__).resolve().parent.parent / "acspl" / "watchdog.prg"
+PROGRAM_PATH = paths.bundled() / "acspl" / "watchdog.prg"
 
 # Any buffer we are willing to overwrite must contain this marker, so we can
 # never silently destroy an unrelated program the user wrote in MMI.

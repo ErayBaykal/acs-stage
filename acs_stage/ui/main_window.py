@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import logging
+import sys
 import threading
 
 from PySide6.QtCore import Qt, QTimer, Signal
@@ -12,6 +13,7 @@ from PySide6.QtWidgets import (
 )
 
 from .. import config as cfg
+from .. import paths
 from ..calibrate import (CalibrationCancelled, TravelCalibrator,
                          write_soft_limits)
 from ..controller import ControllerError, StageController
@@ -876,10 +878,35 @@ class MainWindow(QMainWindow):
         super().closeEvent(event)
 
 
+LOG_FORMAT = "%(asctime)s %(levelname)-7s %(name)s: %(message)s"
+
+
+def _setup_logging() -> None:
+    """Log to a file, and to the console when there is one.
+
+    Built as a windowed executable there is no console at all: sys.stdout is
+    None, so a StreamHandler would either swallow every message or raise while
+    trying to write one. The log therefore always goes to a file beside the
+    program, which is also what makes a failed connection diagnosable after
+    the fact -- the panel is otherwise silent about why nothing happened.
+    """
+    handlers: list[logging.Handler] = []
+    try:
+        handlers.append(logging.FileHandler(paths.data() / "acs-stage.log",
+                                            encoding="utf-8"))
+    except OSError:
+        pass          # read-only location: console-only is better than dying
+    if sys.stdout is not None:
+        handlers.append(logging.StreamHandler(sys.stdout))
+
+    logging.basicConfig(level=logging.INFO, format=LOG_FORMAT,
+                        handlers=handlers)
+
+
 def run() -> int:
-    logging.basicConfig(
-        level=logging.INFO, format="%(asctime)s %(levelname)-7s %(name)s: %(message)s"
-    )
+    _setup_logging()
+    log.info("acs-stage starting (frozen=%s, data dir %s)",
+             paths.frozen(), paths.data())
     app = QApplication([])
     window = MainWindow(StageController())
     window.show()

@@ -13,9 +13,11 @@ from dataclasses import asdict, dataclass
 from datetime import datetime
 from pathlib import Path
 
+from . import paths
+
 log = logging.getLogger(__name__)
 
-STORE_PATH = Path(__file__).resolve().parent.parent / "config" / "travel.json"
+STORE_PATH = paths.data() / "config" / "travel.json"
 
 # Fraction of the measured span held back from each end when deriving usable
 # limits. The ends were found by touching a hard stop or a limit switch; you

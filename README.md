@@ -65,6 +65,33 @@ use the Xbox Wireless Adapter or a cable.
 About six minutes for all five. Repeatability measured across a power cycle:
 axis 5 exact, axis 4 within 5 counts, axis 0 within 813 counts of 5.1 M.
 
+## Standalone executable
+
+```
+.venv\Scripts\python tools\build_exe.py --deploy "C:\path\to\folder"
+```
+
+Produces a single 62 MB `ACS Stage Control.exe` — no Python install needed on
+the target machine, though the ACS ADK Suite still has to be there because the
+SPiiPlus binding loads its libraries.
+
+The exe expects two things beside it:
+
+```
+ACS Stage Control.exe
+config\travel.json      the measured calibration (--deploy copies it)
+acs-stage.log           written at runtime
+```
+
+`travel.json` is deliberately **not** bundled inside the archive. The
+calibration writes it, and a onefile build unpacks to a temp directory that is
+deleted on exit — a calibration saved there would vanish and the next run
+would come up with no travel limits at all. `acs_stage/paths.py` keeps the two
+cases apart: `bundled()` for read-only assets, `data()` for anything written.
+
+There is no console window, so the log file is the only record of what
+happened; a failed connection is otherwise silent.
+
 ## Backing up the controller
 
 The axis tuning, fault configuration and ACSPL+ buffers exist **only** in the

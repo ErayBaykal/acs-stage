@@ -8,3 +8,7 @@ __pycache__/
 
 # Runtime output
 *.log
+
+# PyInstaller build artifacts (the exe is 62 MB; rebuild with tools/build_exe.py)
+build/
+*.spec.bak
