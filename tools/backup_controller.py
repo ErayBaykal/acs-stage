@@ -236,7 +236,19 @@ def write_parameters(outdir, snapshot, missing):
 def dump_buffers(hc, outdir):
     print()
     kept = 0
-    for buf in range(16):
+
+    # The D-buffer sits past the 16 program buffers (index 16 on this
+    # controller) and is easy to miss by scanning range(16). It holds the
+    # `axisdef` names and the global variable declarations, so losing it
+    # means every buffer that references those stops compiling.
+    try:
+        indices = list(range(16)) + [int(sp.GetDBufferIndex(hc, sp.SYNCHRONOUS,
+                                                            True))]
+    except Exception as exc:
+        print(f"could not locate the D-buffer ({exc}); saving 0-15 only")
+        indices = list(range(16))
+
+    for buf in indices:
         try:
             text = sp.UploadBuffer(hc, buf, 0, 64000, sp.SYNCHRONOUS, True) or ""
         except Exception as exc:

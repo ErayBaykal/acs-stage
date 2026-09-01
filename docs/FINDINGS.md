@@ -776,6 +776,53 @@ git and the `.spi` sitting beside it does the actual recovery.
 `--spi` is opt-in because `SaveApplication` writes controller flash before copying flash → file.
 Flash is rated ~100k cycles; run it deliberately, never on a timer.
 
+### What is actually inside a `.spi` — verified by parsing one
+
+`config/backup/application-2026-08-31.spi`, 163,400 bytes, saved from the MMI Application Wizard.
+The container is a length-prefixed record format: a metadata header, then a section table of
+`name / size / CRC32`, then the payloads concatenated at offset `0x978`. **Every payload is plain
+text**, so the file is inspectable without ACS tooling.
+
+Header: firmware `2.60`, controller serial `ECM09393A2`, saving tool `Application Wizard`.
+
+| group | sections | populated | bytes |
+|---|---|---|---|
+| `ACSPL00-15`, `ACSPL_e` | 17 | 3 | 2,950 |
+| `PAR`, `PAR0-15` | 17 | **17** | 100,288 |
+| `ADJ0-15` | 16 | 10 | 56,506 |
+| `I`, `V` | 2 | 2 | 1,232 |
+
+- **`PAR<n>`** is one axis: `NAME(n)=value` lines, **204 parameters per axis** against the 39 in the
+  curated snapshot. `PAR` alone is the system section — network config included (`TCPIP`, `SUBNET`,
+  `TCPPORT`, `S_FMASK`, `S_FDEF`).
+- **`ADJ<n>`** is commutation, as an INI: amplifier identity
+  (`SPiiPlus UDMnt-2-B-2 5/10 DC 24V`) and the adjuster run, dated 7/26/2019 — the original
+  commissioning.
+- **`I` and `V`** are the global variable arrays declared in the D-buffer.
+- Sections for axes with no stage are still present and populated, which is correct: the drives
+  exist even where the stages do not.
+
+Spot-checked against the live readout and every value agrees — `SLLIMIT(0)=-2512710.13`,
+`MFLAGS(0)=2765576` (`0x2a3308`), `CERRV(4)=750`, `XRMSM(4)=2.02`. The two ACSPL buffers extract
+**byte-identical** to what `UploadBuffer` returns from the running controller.
+
+Not represented: **user files**. The controller's file system is either empty or was not selected in
+the wizard. Nothing else is missing.
+
+### The D-buffer holds the axis names — and `range(16)` misses it
+
+`GetDBufferIndex` returns **16** on this controller, one past the program buffers, so a scan of
+`range(16)` silently skips it. It is not optional: it carries the `axisdef` and the `global`
+declarations, so without it every buffer referencing them fails to compile.
+
+```
+axisdef Y1=0,X1=1,Z1=2,Z_BCT1=3,Rz_PUT1=4,Ry_PUT1=5,Rx_PUT1=6,X2=8,X_BCT1=10,Y_BCT1=11
+global int  I(100),I0,...,I99
+global real V(100),V0,...,V99
+```
+
+That `axisdef` is the authoritative naming, and it agrees with the buffer 1 comments below.
+
 ### The machine builder's axis names, recovered from buffer 1
 
 Buffer 1 holds an integrator's startup program that sets `KDEC`/`JERK` per axis, each line commented

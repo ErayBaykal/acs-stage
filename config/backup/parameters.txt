@@ -1,5 +1,5 @@
 # controller 10.0.0.101:701
-# read at    2026-08-31T17:57:40
+# read at    2026-08-31T18:13:52
 #
 # Readable snapshot for diffing. NOT a restore image -- use the .spi.
 
